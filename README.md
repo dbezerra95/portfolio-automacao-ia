@@ -24,6 +24,23 @@ Projetos práticos de automação, integração de sistemas e IA com supervisão
 | Radar de IA | Reúne e resume notícias inéditas de fontes públicas. | [ai-radar](ai-radar/) |
 | Zonas de manejo | Identifica diferenças de vegetação e sugere pontos para amostragem de solo. | [soil-management-zones](soil-management-zones/) |
 
+
+## Integrações com o Judiciário e bases públicas
+
+| Base | O que se consulta | Como | Onde |
+| --- | --- | --- | --- |
+| DataJud (CNJ) | Classe, assuntos, órgão julgador e movimentações por número de processo (sem texto de decisão nem partes) | API pública com chave publicada pelo CNJ | judicial-monitor |
+| DJEN / Comunica (CNJ) | Comunicações e intimações publicadas | API pública | judicial-monitor |
+| PJe TJDFT (consulta pública, 1º e 2º grau) | Processo e movimentações | API REST pública, sem login | judicial-monitor |
+| e-SAJ TJSP | Inteiro teor de documentos do processo em PDF | Rota pública da consulta processual | Validado em projeto próprio, fora deste repo |
+| Portal do STF | Andamentos e peças por incidente | Coleta no portal (cadeia TLS incompleta tratada sem desligar a verificação) | Validado em projeto próprio, fora deste repo |
+| Jurisprudência do TST | Ementa e inteiro teor | API de busca textual do portal | Validado em projeto próprio, fora deste repo |
+| Câmara e Senado (dados abertos) | Tramitação e inteiro teor de projetos de lei | APIs de dados abertos | Validado em projeto próprio, fora deste repo |
+| CNPJ (Receita Federal, dados abertos) | Cadastro de empresas, 28,4 milhões de registros | Download em lote e Spark | spark-ai-cascade (resultados do original) |
+| eproc (TRF4 e tribunais estaduais) | Inteiro teor | Bloqueado por desafio anti-robô (Cloudflare Turnstile); metadados via DataJud e DJEN | Limite documentado: não contornamos |
+
+Todas as integrações usam rotas públicas, sem login de advogado nem certificado digital, e consultam por número de processo, nunca por pessoa.
+
 ## Governança de IA por projeto
 
 | Projeto | Classe de risco (baixo/médio/alto, avaliação própria) | Decisão humana em | O que sai para LLM externo | Registro/auditoria |

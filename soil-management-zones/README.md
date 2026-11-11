@@ -7,6 +7,10 @@
 - Gera mapas, pontos geográficos e um resumo auditável das cenas utilizadas.
 
 ## Demonstração
+![Quadros do reel da série Olho na Lavoura no Instagram](docs/reel-instagram.jpg)
+
+O mesmo método em produção, contado na série *Olho na Lavoura* do Instagram [@dbctech.br](https://www.instagram.com/dbctech.br/): zonas por pivô a partir de quatro safras e, nos talhões uniformes, um único ponto de coleta, sem zona inventada.
+
 ![Zonas de manejo sobre imagem em cor real](docs/zonas.png)
 Zonas ordenadas do menor para o maior NDVI relativo; Z1, Z2 e Z3 marcam os pontos sugeridos e a legenda mostra a porcentagem da área mapeada.
 

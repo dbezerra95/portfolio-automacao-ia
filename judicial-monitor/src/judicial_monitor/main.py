@@ -48,10 +48,10 @@ def mask(number: str) -> str:
     return "*******-**.****.*.**." + number[-4:]
 
 
-def request_json(client: httpx.Client, url: str, params: dict[str, Any], delay: float) -> dict[str, Any]:
+def request_json(client: httpx.Client, url: str, params: dict[str, Any], delay: float, *, headers: dict[str, str] | None = None, post: bool = False) -> dict[str, Any]:
     for attempt in range(3):
         time.sleep(delay)
-        response = client.get(url, params=params)
+        response = client.post(url, json=params, headers=headers) if post else client.get(url, params=params)
         if response.status_code == 429 or response.status_code >= 500:
             if attempt < 2:
                 time.sleep(2 ** attempt)
@@ -99,12 +99,50 @@ def fetch_movements(client: httpx.Client, config: Config, number: str, base: str
             return items
 
 
+class DataJudConfigError(ValueError):
+    pass
+
+
+def datajud_alias(number: str) -> str:
+    digits = re.sub(r"\D", "", number)
+    aliases = {"807": "api_publica_tjdft", "826": "api_publica_tjsp"}
+    segment = digits[13:16]
+    if segment not in aliases:
+        raise DataJudConfigError(f"Tribunal DataJud não mapeado para J.TR {segment}")
+    return aliases[segment]
+
+
+def fetch_datajud(client: httpx.Client, config: Config, number: str) -> list[dict[str, Any]]:
+    alias = datajud_alias(number)
+    key = os.environ.get("DATAJUD_API_KEY", "").strip()
+    if not key:
+        raise DataJudConfigError("Configure DATAJUD_API_KEY com a chave pública do CNJ")
+    digits = re.sub(r"\D", "", number)
+    data = request_json(client, f"https://api-publica.datajud.cnj.jus.br/{alias}/_search",
+                        {"query": {"match": {"numeroProcesso": digits}}}, config.delay_seconds,
+                        headers={"Authorization": f"APIKey {key}"}, post=True)
+    results = []
+    for hit in data.get("hits", {}).get("hits", []):
+        process = hit.get("_source", {})
+        if str(process.get("numeroProcesso", "")) != digits:
+            continue
+        results.append({"classe": process.get("classe", {}).get("nome"),
+                        "assuntos": [subject.get("nome") for subject in process.get("assuntos", [])],
+                        "orgaoJulgador": process.get("orgaoJulgador", {}).get("nome"),
+                        "movimentos": process.get("movimentos", [])})
+    return results
+
+
 def item_id(source: str, number: str, item: dict[str, Any]) -> str:
     if source == "DJEN":
         identifier = item.get("hash") or item.get("id")
         if not identifier:
             raise ValueError("Comunicação sem identificador")
         key = str(identifier)
+    elif source == "DataJud":
+        if not item.get("nome"):
+            raise ValueError("Movimentação DataJud sem descrição")
+        key = json.dumps({k: v for k, v in item.items() if k != "_process"}, sort_keys=True, ensure_ascii=False)
     else:
         key = json.dumps([item.get("id"), item.get("movimento"), item.get("dataAtualizacao")], ensure_ascii=False)
         if not item.get("id") and not item.get("movimento"):
@@ -139,19 +177,27 @@ def run(config: Config, client: httpx.Client, dry_run: bool = False) -> int:
         seen = set(state)
     failed = False
     for number in config.processes:
-        for source, base in (("DJEN", ""), ("TJDFT 1g", config.tjdft_1g_url), ("TJDFT 2g", config.tjdft_2g_url)):
+        for source, base in (("DJEN", ""), ("TJDFT 1g", config.tjdft_1g_url), ("TJDFT 2g", config.tjdft_2g_url), ("DataJud", "")):
             started = time.monotonic()
             count = 0
             error = None
             try:
-                items = fetch_djen(client, config, number) if source == "DJEN" else fetch_movements(client, config, number, base)
+                if source == "DataJud":
+                    processes = fetch_datajud(client, config, number)
+                    items = [dict(movement, _process=process) for process in processes for movement in process["movimentos"]]
+                else:
+                    items = fetch_djen(client, config, number) if source == "DJEN" else fetch_movements(client, config, number, base)
                 for item in items:
                     identity = item_id(source, number, item)
                     if identity in seen:
                         continue
-                    description = str(item.get("tipoComunicacao") or item.get("movimento") or "Comunicação")
-                    date = str(item.get("data_disponibilizacao") or item.get("dataAtualizacao") or "")
-                    notify(f"{mask(number)} | {source} | {description} | {date}", client, dry_run)
+                    description = str(item.get("tipoComunicacao") or item.get("movimento") or item.get("nome") or "Comunicação")
+                    date = str(item.get("data_disponibilizacao") or item.get("dataAtualizacao") or item.get("dataHora") or "")
+                    message = f"{mask(number)} | {source} | {description} | {date}"
+                    if source == "DataJud":
+                        process = item["_process"]
+                        message += f" | Classe: {process['classe']} | Assuntos: {', '.join(filter(None, process['assuntos']))} | Órgão julgador: {process['orgaoJulgador']}"
+                    notify(message, client, dry_run)
                     seen.add(identity)
                     count += 1
                     if not dry_run:
@@ -160,6 +206,8 @@ def run(config: Config, client: httpx.Client, dry_run: bool = False) -> int:
                         tmp.write_text(json.dumps(sorted(seen)), encoding="utf-8")
                         tmp.replace(config.state_file)
             except Exception as exc:
+                if isinstance(exc, DataJudConfigError):
+                    print(f"DataJud: {exc}", file=sys.stderr)
                 failed = True
                 # Error classes avoid leaking URLs, process numbers, or webhook credentials.
                 error = type(exc).__name__
