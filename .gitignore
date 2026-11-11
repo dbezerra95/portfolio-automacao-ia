@@ -1,0 +1,10 @@
+logs/
+.env
+.env.*
+!.env.example
+__pycache__/
+.venv/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+node_modules/
