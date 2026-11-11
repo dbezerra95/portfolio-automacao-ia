@@ -1,0 +1,8 @@
+[Unit]
+Description=AI radar failure alert
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/ai-radar
+EnvironmentFile=/opt/ai-radar/.env
+ExecStart=/usr/local/bin/uv run ai-radar alert

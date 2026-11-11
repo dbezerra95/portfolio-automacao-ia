@@ -1,0 +1,1 @@
+"""Scheduled AI news digest."""

@@ -1,0 +1,9 @@
+[Unit]
+Description=Run AI radar twice a week
+
+[Timer]
+OnCalendar=Mon,Thu *-*-* 09:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

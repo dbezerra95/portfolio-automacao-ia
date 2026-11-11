@@ -1,0 +1,12 @@
+{
+  "name": "Illustrative lead pipeline",
+  "nodes": [
+    {"id":"1","name":"Webhook","type":"n8n-nodes-base.webhook","typeVersion":2,"position":[0,0],"parameters":{"httpMethod":"POST","path":"lead"}},
+    {"id":"2","name":"Normalize","type":"n8n-nodes-base.set","typeVersion":3.4,"position":[220,0],"parameters":{"assignments":{"assignments":[{"id":"message","name":"message","value":"={{ $json.body.message }}","type":"string"},{"id":"history","name":"history","value":"={{ $json.body.history || [] }}","type":"array"}]}}},
+    {"id":"3","name":"Qualify","type":"n8n-nodes-base.httpRequest","typeVersion":4.2,"position":[440,0],"parameters":{"method":"POST","url":"https://qualifier.example.com/qualify","sendBody":true,"specifyBody":"json","jsonBody":"={{ JSON.stringify($json) }}"}},
+    {"id":"4","name":"Create conversation","type":"n8n-nodes-base.httpRequest","typeVersion":4.2,"position":[660,0],"parameters":{"method":"POST","url":"https://helpdesk.example.com/conversations","sendBody":true,"specifyBody":"json","jsonBody":"={{ JSON.stringify($json) }}"}},
+    {"id":"5","name":"Notify","type":"n8n-nodes-base.httpRequest","typeVersion":4.2,"position":[880,0],"parameters":{"method":"POST","url":"https://notify.example.com/webhook","sendBody":true,"specifyBody":"json","jsonBody":"={{ JSON.stringify($json) }}"}}
+  ],
+  "connections":{"Webhook":{"main":[[{"node":"Normalize","type":"main","index":0}]]},"Normalize":{"main":[[{"node":"Qualify","type":"main","index":0}]]},"Qualify":{"main":[[{"node":"Create conversation","type":"main","index":0}]]},"Create conversation":{"main":[[{"node":"Notify","type":"main","index":0}]]}},
+  "settings":{},"active":false
+}
