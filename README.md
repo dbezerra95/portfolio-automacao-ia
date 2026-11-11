@@ -14,6 +14,7 @@ Projetos práticos de automação, integração de sistemas e IA com supervisão
 
 | Projeto | Em uma frase | Ver |
 | --- | --- | --- |
+| Resposta automática no Instagram | Responde comentários com palavra-chave por mensagem privada. | [instagram-auto-reply](instagram-auto-reply/) |
 | Conciliação de legado | Compara contribuições da folha com um sistema sem API e destaca divergências para revisão. | [rpa-legacy-reconciliation](rpa-legacy-reconciliation/) |
 | Monitor judicial | Acompanha publicações do DJEN (CNJ) e movimentações do PJe (TJDFT) por número de processo, com estado idempotente, alerta de falha e auditoria, sem busca por pessoa. | [judicial-monitor](judicial-monitor/) |
 | Assistente para loja de autopeças | Faz triagem de mensagens e pausa o bot quando um humano assume. | [whatsapp-ai-agent](whatsapp-ai-agent/) |
@@ -62,7 +63,7 @@ Classificação inspirada em políticas públicas de uso de IA (risco, supervis�
 | Requisito | Onde ver |
 | --- | --- |
 | Automação e RPA | [rpa-legacy-reconciliation](rpa-legacy-reconciliation/), [rpa-collectors](rpa-collectors/), [judicial-monitor](judicial-monitor/) |
-| APIs e integração | [judicial-monitor](judicial-monitor/), [whatsapp-ai-agent](whatsapp-ai-agent/), [lead-qualifier-agent](lead-qualifier-agent/) |
+| APIs e integração | [instagram-auto-reply](instagram-auto-reply/), [judicial-monitor](judicial-monitor/), [whatsapp-ai-agent](whatsapp-ai-agent/), [lead-qualifier-agent](lead-qualifier-agent/) |
 | IA prática | Extração estruturada em [lead-qualifier-agent](lead-qualifier-agent/), [spark-ai-cascade](spark-ai-cascade/), [llm-router](llm-router/), [whatsapp-ai-agent](whatsapp-ai-agent/) |
 | Arquitetura e banco de dados | [spark-ai-cascade](spark-ai-cascade/), [rpa-collectors](rpa-collectors/), [whatsapp-ai-agent](whatsapp-ai-agent/) |
 | Boas práticas e evitar over-engineering | [spark-ai-cascade](spark-ai-cascade/): LLM só onde compensa; [llm-router](llm-router/) |

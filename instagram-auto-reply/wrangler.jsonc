@@ -1,0 +1,9 @@
+{
+  "name": "instagram-auto-reply",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-11",
+  "observability": { "enabled": true, "traces": { "enabled": true } },
+  "d1_databases": [{ "binding": "DB", "database_name": "instagram-replies", "database_id": "00000000-0000-0000-0000-000000000000" }],
+  "kv_namespaces": [{ "binding": "TOKENS", "id": "replace_with_kv_namespace_id" }],
+  "triggers": { "crons": ["0 0 * * *"] }
+}

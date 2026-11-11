@@ -36,3 +36,19 @@ jobs:
       - run: uv run playwright install --with-deps chromium
         if: matrix.project == 'rpa-legacy-reconciliation'
       - run: uv run pytest -q
+  test-node:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: instagram-auto-reply
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.20.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
