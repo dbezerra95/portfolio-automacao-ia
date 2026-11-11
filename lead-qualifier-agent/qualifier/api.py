@@ -9,7 +9,7 @@ from qualifier.core import Message, Result, conversation_step
 
 
 class OpenAIProvider:
-    def reply(self, system: str, question: str) -> str:
+    def reply(self, system: str, message: str) -> str:
         key = os.environ.get("LLM_API_KEY")
         if not key:
             raise ValueError("LLM_API_KEY is required")
@@ -17,7 +17,7 @@ class OpenAIProvider:
             os.environ.get("LLM_BASE_URL", "https://api.openai.com/v1").rstrip("/") + "/chat/completions",
             headers={"Authorization": f"Bearer {key}"},
             json={"model": os.environ.get("LLM_MODEL", "gpt-4o-mini"), "messages": [
-                {"role": "system", "content": system}, {"role": "user", "content": question}
+                {"role": "system", "content": system}, {"role": "user", "content": message}
             ]}, timeout=30,
         )
         response.raise_for_status()

@@ -1,7 +1,7 @@
 import httpx
 import pytest
 
-from llm_router import Provider, Router
+from llm_router import ConfigError, Provider, Router, main
 
 
 @pytest.fixture
@@ -32,4 +32,29 @@ def test_fallback(providers, first):
 def test_all_fail(providers):
     client = httpx.Client(transport=httpx.MockTransport(lambda request: httpx.Response(503)))
     with pytest.raises(RuntimeError, match="All providers failed"):
+        Router(providers, client).route("hello")
+
+
+def test_missing_key_fails_before_any_request(providers, monkeypatch):
+    providers[1].api_key_env = "MISSING_KEY"
+    monkeypatch.delenv("MISSING_KEY", raising=False)
+    requests = []
+    client = httpx.Client(transport=httpx.MockTransport(lambda request: requests.append(request)))
+    with pytest.raises(ConfigError, match="MISSING_KEY"):
+        Router(providers, client).route("hello")
+    assert requests == []
+
+
+def test_unknown_task_is_config_error(tmp_path, monkeypatch):
+    config = tmp_path / "providers.toml"
+    config.write_text("[tasks]\ndefault = []\n")
+    monkeypatch.setattr("sys.argv", ["llm-router", "hello", "--config", str(config),
+                                    "--task", "unknown"])
+    with pytest.raises(ConfigError, match="Unknown task: unknown"):
+        main()
+
+
+def test_unexpected_response_does_not_fallback(providers):
+    client = httpx.Client(transport=httpx.MockTransport(lambda request: httpx.Response(200, json={})))
+    with pytest.raises(KeyError):
         Router(providers, client).route("hello")

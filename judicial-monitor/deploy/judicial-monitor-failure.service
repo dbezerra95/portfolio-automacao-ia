@@ -1,0 +1,8 @@
+[Unit]
+Description=Alerta de falha do monitor judicial
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/judicial-monitor
+EnvironmentFile=-%h/judicial-monitor/.env
+ExecStart=%h/.local/bin/uv run judicial-monitor alert

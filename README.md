@@ -1,35 +1,55 @@
 # Portfólio: Automação e IA aplicada
 
-Cinco projetos Python demonstram soluções práticas para automatizar processos, integrar sistemas e aplicar IA com controle humano.
+Projetos práticos de automação, integração de sistemas e IA com supervisão humana.
 
 ![CI](https://github.com/dbezerra95/portfolio-automacao-ia/actions/workflows/ci.yml/badge.svg)
 
-## Em 30 segundos
+## O que este repositório prova
 
-- Automação de processos e RPA com coleta, normalização e integração de dados.
-- IA aplicada com guardrails e supervisão humana em fluxos de atendimento e triagem.
-- Engenharia com testes automatizados e CI para os cinco projetos.
+- Automatização de processos e coleta de dados com resultados verificáveis.
+- Aplicação de IA em atendimento, triagem e análise, com decisões humanas quando necessário.
+- Engenharia com testes automatizados, integração de sistemas e CI.
 
 ## Projetos
 
-| Projeto | Problema que resolve | Destaque técnico | Stack |
-| --- | --- | --- | --- |
-| [whatsapp-ai-agent](whatsapp-ai-agent/) | Triagem de mensagens repetitivas para uma loja de autopeças. | Webhook classifica mensagens e pausa o bot após atendimento humano; retorna a resposta sem envio real ao WhatsApp. | Python, FastAPI, HTTPX, SQLite |
-| [llm-router](llm-router/) | Indisponibilidade ou resposta vazia de provedores de linguagem. | Cascata com fallback para falhas temporárias e registro de provedor e latência. | Python, HTTPX, Pydantic, TOML |
-| [rpa-collectors](rpa-collectors/) | Coleta periódica de páginas públicas sem duplicar registros. | Chave natural e hash identificam criações, alterações e itens inalterados. | Python, Playwright, HTTPX, BeautifulSoup, SQLite |
-| [lead-qualifier-agent](lead-qualifier-agent/) | Coleta inicial de informações para triagem em um escritório fictício. | Perguntas fixas, filtro de padrões e resumo estruturado para revisão por advogado. | Python, FastAPI, Pydantic, HTTPX |
-| [ai-radar](ai-radar/) | Acompanhamento de fontes de IA e notícias já vistas. | Deduplicação de feeds, resumo por LLM e digest em Markdown para Discord ou console. | Python, HTTPX, feedparser, Pydantic, PyYAML |
+| Projeto | Em uma frase | Ver |
+| --- | --- | --- |
+| Conciliação de legado | Compara contribuições da folha com um sistema sem API e destaca divergências para revisão. | [rpa-legacy-reconciliation](rpa-legacy-reconciliation/) |
+| Monitor judicial | Acompanha publicações do DJEN (CNJ) e movimentações do PJe (TJDFT) por número de processo, com estado idempotente, alerta de falha e auditoria, sem busca por pessoa. | [judicial-monitor](judicial-monitor/) |
+| Assistente para loja de autopeças | Faz triagem de mensagens e pausa o bot quando um humano assume. | [whatsapp-ai-agent](whatsapp-ai-agent/) |
+| Qualificação de leads | Extrai dados iniciais de mensagens e prepara resumo para revisão por advogado. | [lead-qualifier-agent](lead-qualifier-agent/) |
+| Cascata de classificação | Cascata de classificação: Spark ML resolve o que tem confiança e só o resto vai para a LLM, com acurácia e custo medidos no projeto original. | [spark-ai-cascade](spark-ai-cascade/) |
+| Roteador de LLM | Tenta outro provedor quando uma resposta falha temporariamente. | [llm-router](llm-router/) |
+| Coletores RPA | Coleta dados públicos e identifica alterações sem duplicar registros. | [rpa-collectors](rpa-collectors/) |
+| Radar de IA | Reúne e resume notícias inéditas de fontes públicas. | [ai-radar](ai-radar/) |
+| Zonas de manejo | Identifica diferenças de vegetação e sugere pontos para amostragem de solo. | [soil-management-zones](soil-management-zones/) |
+
+## Governança de IA por projeto
+
+| Projeto | Classe de risco (baixo/médio/alto, avaliação própria) | Decisão humana em | O que sai para LLM externo | Registro/auditoria |
+| --- | --- | --- | --- | --- |
+| [rpa-legacy-reconciliation](rpa-legacy-reconciliation/) | Médio | Revisão de divergências e correções; robô apenas lê | Nenhum LLM | Eventos JSONL, relatório e captura em falha |
+| [judicial-monitor](judicial-monitor/) | Médio | Acompanhamento dos processos e providências | Nenhum LLM | Auditoria e estado idempotente |
+| [whatsapp-ai-agent](whatsapp-ai-agent/) | Médio | Atendimento assumido por pessoa | Mensagem do cliente com dados pessoais mascarados | Decisões em JSONL; estado em SQLite |
+| [lead-qualifier-agent](lead-qualifier-agent/) | Alto | Decisão jurídica com advogado | Uma mensagem do lead por chamada e campos ausentes; histórico reprocessado individualmente | Resumo retornado ao integrador; API não persiste dados |
+| [spark-ai-cascade](spark-ai-cascade/) | Médio | Uso dos resultados da classificação | Na réplica, dados sintéticos de casos de baixa confiança | Métricas de acurácia e custo no projeto original |
+| [llm-router](llm-router/) | Médio | Uso da resposta e configuração de provedores | Prompt informado pelo usuário | Provedor e latência na resposta; sem auditoria persistente |
+| [rpa-collectors](rpa-collectors/) | Baixo | Uso dos dados coletados | Nenhum LLM | Registros e hashes em SQLite; contagens por execução |
+| [ai-radar](ai-radar/) | Baixo | Leitura e uso do digest | Título e descrição de notícia pública | Digest, estado de links e alerta de falha |
+| [soil-management-zones](soil-management-zones/) | Médio | Escolha e análise das amostras de solo | Nenhum LLM | Mapas, pontos e resumo das cenas utilizadas |
+
+Classificação inspirada em políticas públicas de uso de IA (risco, supervisão humana, inventário); é uma autoavaliação, não uma certificação.
 
 ## Requisitos
 
 | Requisito | Onde ver |
 | --- | --- |
-| Automação de processos (RPA, integrações, scripts) | [rpa-collectors](rpa-collectors/), [ai-radar](ai-radar/) |
-| APIs e integração de sistemas | [whatsapp-ai-agent](whatsapp-ai-agent/), [lead-qualifier-agent](lead-qualifier-agent/), [ai-radar](ai-radar/) |
-| Uso prático de IA (LLMs, NLP, automação inteligente) | [whatsapp-ai-agent](whatsapp-ai-agent/), [llm-router](llm-router/), [lead-qualifier-agent](lead-qualifier-agent/), [ai-radar](ai-radar/) |
-| Arquitetura e banco de dados | [rpa-collectors](rpa-collectors/), [whatsapp-ai-agent](whatsapp-ai-agent/) |
-| Boas práticas e evitar over-engineering | [rpa-collectors](rpa-collectors/), [llm-router](llm-router/) |
-| Monitorar resultados e evoluir as soluções | [rpa-collectors](rpa-collectors/), [llm-router](llm-router/), [ai-radar](ai-radar/) |
+| Automação e RPA | [rpa-legacy-reconciliation](rpa-legacy-reconciliation/), [rpa-collectors](rpa-collectors/), [judicial-monitor](judicial-monitor/) |
+| APIs e integração | [judicial-monitor](judicial-monitor/), [whatsapp-ai-agent](whatsapp-ai-agent/), [lead-qualifier-agent](lead-qualifier-agent/) |
+| IA prática | Extração estruturada em [lead-qualifier-agent](lead-qualifier-agent/), [spark-ai-cascade](spark-ai-cascade/), [llm-router](llm-router/), [whatsapp-ai-agent](whatsapp-ai-agent/) |
+| Arquitetura e banco de dados | [spark-ai-cascade](spark-ai-cascade/), [rpa-collectors](rpa-collectors/), [whatsapp-ai-agent](whatsapp-ai-agent/) |
+| Boas práticas e evitar over-engineering | [spark-ai-cascade](spark-ai-cascade/): LLM só onde compensa; [llm-router](llm-router/) |
+| Monitorar e evoluir | Auditoria JSONL em [whatsapp-ai-agent](whatsapp-ai-agent/), [rpa-legacy-reconciliation](rpa-legacy-reconciliation/) e [judicial-monitor](judicial-monitor/); alertas de falha em [ai-radar](ai-radar/) e [judicial-monitor](judicial-monitor/) |
 
 ## Princípios
 
@@ -48,19 +68,11 @@ flowchart LR
 
 ## Como rodar
 
-Entre na pasta de um projeto e execute:
-
-```bash
-cd nome-do-projeto
-uv sync
-uv run pytest -q
-```
-
-Consulte o README de cada projeto para executar suas funcionalidades e configurar eventuais integrações.
+Em cada projeto, execute `uv sync` e `uv run pytest -q`. Consulte seu README para executar as funcionalidades e configurar integrações.
 
 ## Como regenerar as imagens
 
-Na raiz, execute `uv run --with rich --with playwright python scripts/make_screenshots.py`; se necessário, instale o navegador com `uv run --with playwright playwright install chromium`. A página Swagger usa recursos carregados pela internet.
+Na raiz, execute `uv run --with rich --with playwright python scripts/make_screenshots.py`; se necessário, instale o navegador com `uv run --with playwright playwright install chromium`. A página Swagger usa recursos carregados pela internet. Para a tela do legado, execute `uv run python scripts/make_screenshot.py` dentro de `rpa-legacy-reconciliation/`, com a localidade `pt_BR.UTF-8` instalada no sistema.
 
 ## Sobre
 

@@ -1,0 +1,9 @@
+[Unit]
+Description=Monitor diário de publicações e movimentos judiciais
+OnFailure=judicial-monitor-failure.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/judicial-monitor
+EnvironmentFile=-%h/judicial-monitor/.env
+ExecStart=%h/.local/bin/uv run judicial-monitor run --config config.example.yaml

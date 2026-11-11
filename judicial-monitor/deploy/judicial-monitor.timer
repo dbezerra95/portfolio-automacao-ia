@@ -1,0 +1,9 @@
+[Unit]
+Description=Executa o monitor judicial diariamente
+
+[Timer]
+OnCalendar=*-*-* 08:30:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

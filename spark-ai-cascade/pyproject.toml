@@ -1,0 +1,29 @@
+[project]
+name = "spark-ai-cascade"
+version = "0.1.0"
+description = "Cascata sintética de classificação CNAE com Spark e LLM"
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "pyspark>=3.5,<4",
+    "rich>=13",
+    "numpy>=1.24,<2",
+    "pandas>=1.5,<3",
+]
+
+[project.scripts]
+spark-cascade = "spark_cascade.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+package = true
+
+[tool.uv.workspace]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/spark_cascade"]

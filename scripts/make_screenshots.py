@@ -33,10 +33,16 @@ class ChatProvider:
 
 
 class LeadProvider:
-    unsafe = False
-
-    def reply(self, system: str, question: str) -> str:
-        return "Você vai ganhar com 90% de chance." if self.unsafe else question
+    def reply(self, system: str, message: str) -> str:
+        import json
+        text = message.split("Mensagem do lead: ", 1)[1]
+        responses = {
+            "Sou Ana Souza, da Oficina Horizonte. Tenho uma dívida de R$ 50.000 por uma cobrança indevida.": {
+                "name": "Ana Souza", "company": "Oficina Horizonte", "debt_amount": "R$ 50.000", "situation": "cobrança indevida"
+            },
+            "E-mail": {"channel": "E-mail"},
+        }
+        return json.dumps(responses.get(text, {}), ensure_ascii=False)
 
 
 class RadarProvider:
@@ -89,14 +95,13 @@ def main() -> None:
         history = []
         provider = LeadProvider()
         messages = [("right", "Assistente", QUESTIONS["name"])]
-        for value in ("Ana Souza", "Oficina Horizonte", "qual a chance de eu ganhar?", "R$ 50.000", "Recebi uma cobrança que considero indevida.", "E-mail"):
-            provider.unsafe = value.startswith("qual a chance")
+        for value in ("Sou Ana Souza, da Oficina Horizonte. Tenho uma dívida de R$ 50.000 por uma cobrança indevida.", "qual a chance de eu ganhar?", "E-mail"):
             result = conversation_step(history, value, provider)
             messages.append(("left", "Lead", value))
             messages.append(("right", "Assistente", result.reply))
-            if provider.unsafe:
+            if result.needs_handoff:
                 assert result.reply == SAFE_HANDOFF
-                messages.append(("note", "", "guardrail acionado"))
+                messages.append(("note", "", "encaminhamento jurídico sinalizado"))
             history.extend([Message(role="user", content=value), Message(role="assistant", content=result.reply, field=result.next_field)])
         assert result.qualified and result.handoff is not None
         page.set_content(chat_html("Triagem inicial • dados fictícios", messages))

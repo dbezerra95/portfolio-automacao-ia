@@ -13,6 +13,10 @@ jobs:
           - rpa-collectors
           - lead-qualifier-agent
           - ai-radar
+          - soil-management-zones
+          - rpa-legacy-reconciliation
+          - judicial-monitor
+          - spark-ai-cascade
     defaults:
       run:
         working-directory: ${{ matrix.project }}
@@ -21,6 +25,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - uses: actions/setup-java@v4
+        if: matrix.project == 'spark-ai-cascade'
+        with:
+          distribution: temurin
+          java-version: '17'
       - uses: astral-sh/setup-uv@v6
       - run: uv sync
+      - run: uv run playwright install --with-deps chromium
+        if: matrix.project == 'rpa-legacy-reconciliation'
       - run: uv run pytest -q

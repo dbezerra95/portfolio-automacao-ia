@@ -1,0 +1,8 @@
+processes:
+  - "0000001-73.2024.8.07.0001"
+djen_url: https://comunicaapi.pje.jus.br/api/v1/comunicacao
+tjdft_1g_url: https://pje-consultapublica-api.tjdft.jus.br
+tjdft_2g_url: https://pje2i-consultapublica-api.tjdft.jus.br
+state_file: state.json
+audit_file: audit.jsonl
+delay_seconds: 1
