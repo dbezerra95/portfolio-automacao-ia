@@ -7,34 +7,39 @@
 - Execução local por padrão (Ollama), com API FastAPI e um fluxo n8n que encaminha para a área responsável o que não tem base.
 
 ## Demonstração
-Saída real da CLI com Ollama local (`qwen2.5:7b` para a resposta, `bge-m3` para os embeddings), em 17/11/2026:
+Perguntas reais com Ollama local (`qwen2.5:7b` para a resposta, `bge-m3` para os embeddings), em 17/11/2026:
+
+| Pergunta | Resposta do modelo (resumo) | Citação conferida | `grounded` |
+| --- | --- | --- | --- |
+| O participante pode levar o dinheiro acumulado para outro plano? | Sim, por portabilidade, que não caracteriza resgate | LC 109/2001, Art. 27 | `true` |
+| Em quanto tempo prescreve o direito a receber benefícios não pagos? | Cinco anos, ressalvados menores dependentes, incapazes e ausentes | LC 109/2001, Art. 75 | `true` |
+| Qual a capital da França? | Recusa sem chamar o modelo | nenhuma | `false` |
+
+Saída completa de uma pergunta na CLI:
 
 ```text
-$ uv run rag-normativos index --embeddings
-110 artigos indexados em index/chunks.json (embeddings)
-
-$ uv run rag-normativos ask "O participante pode levar o dinheiro acumulado para outro plano?"
-Sim, o participante pode levar o dinheiro acumulado para outro plano, desde que seja uma portabilidade. De acordo com o Art. 27 da Lei Complementar 109/2001, é assegurado aos participantes o direito à portabilidade, inclusive para plano de benefício de entidade fechada. No entanto, é importante notar que a portabilidade não caracteriza resgate (Art. 27, §1º) e que os recursos financeiros não podem transitar pelos participantes, sob qualquer forma (Art. 27, §2º, I).
-
-- LC 109/2001, Art. 27: Art. 27. Observados os conceitos, a forma, as condições e os critérios fixados pelo órgão regulador, é assegurado aos participantes o direito à portabilidade, ...
-grounded: true
-
 $ uv run rag-normativos ask "Em quanto tempo prescreve o direito a receber benefícios não pagos?"
-De acordo com o Art. 75 da LC 109/2001, o direito a receber benefícios não pagos prescreve em cinco anos, ressalvados os direitos dos menores dependentes, incapazes ou ausentes, conforme regulamentado pelo Código Civil.
+De acordo com o Art. 75 da LC 109/2001, o direito a receber benefícios não pagos
+prescreve em cinco anos, ressalvados os direitos dos menores dependentes,
+incapazes ou ausentes, conforme regulamentado pelo Código Civil.
 
-- LC 109/2001, Art. 75: Art. 75. Sem prejuízo do benefício, prescreve em cinco anos o direito às prestações não pagas nem reclamadas na época própria, ...
+- LC 109/2001, Art. 75: Art. 75. Sem prejuízo do benefício, prescreve em cinco
+  anos o direito às prestações não pagas nem reclamadas na época própria, ...
 grounded: true
-
-$ uv run rag-normativos ask "Qual a capital da França?"
-Não encontrei isso nos normativos indexados.
-
-grounded: false
 ```
 
-A pergunta fora do escopo é recusada antes de chamar o modelo. Cada chamada grava uma linha no log de auditoria:
+O mesmo fluxo pelo n8n (importado e testado no n8n 2.48.4), via `POST /webhook/pergunta-normativos`:
 
 ```json
-{"question": "Em quanto tempo prescreve o direito a receber benefícios não pagos?", "retrieved": ["LC 109/2001 Art. 75", "LC 109/2001 Art. 14", "LC 109/2001 Art. 59"], "grounded": true}
+{"status": "answered",
+ "answer": "De acordo com o Art. 75 da LC 109/2001, ...",
+ "citations": [{"norma": "LC 109/2001", "artigo": "Art. 75", "trecho": "..."}]}
+{"status": "forwarded", "answer": "Sua pergunta foi encaminhada para a área responsável."}
+```
+
+Cada chamada grava uma linha no log de auditoria:
+
+```json
 {"question": "Qual a capital da França?", "retrieved": [], "grounded": false}
 ```
 
