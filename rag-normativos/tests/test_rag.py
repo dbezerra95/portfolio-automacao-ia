@@ -153,6 +153,8 @@ def test_n8n_workflow_nodes_and_connections():
     flow = json.loads((ROOT / "n8n/workflow.json").read_text())
     nodes = {n["name"]: n for n in flow["nodes"]}
     assert nodes["Webhook"]["type"] == "n8n-nodes-base.webhook" and nodes["Webhook"]["parameters"]["httpMethod"] == "POST"
+    # n8n 2.x does not register a production webhook whose node has no webhookId (found importing into n8n 2.48.4).
+    assert nodes["Webhook"].get("webhookId")
     assert nodes["Ask"]["type"] == "n8n-nodes-base.httpRequest" and nodes["Ask"]["parameters"]["url"].endswith("/ask")
     assert nodes["Grounded?"]["type"] == "n8n-nodes-base.if"
     assert "$json.grounded" in json.dumps(nodes["Grounded?"]["parameters"])
