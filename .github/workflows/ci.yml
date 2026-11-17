@@ -18,6 +18,7 @@ jobs:
           - rpa-legacy-reconciliation
           - judicial-monitor
           - spark-ai-cascade
+          - rag-normativos
     defaults:
       run:
         working-directory: ${{ matrix.project }}

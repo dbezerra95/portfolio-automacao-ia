@@ -1,0 +1,12 @@
+{
+  "name": "RAG normativos com encaminhamento humano",
+  "nodes": [
+    {"id":"1","name":"Webhook","type":"n8n-nodes-base.webhook","typeVersion":2,"position":[0,0],"parameters":{"httpMethod":"POST","path":"pergunta-normativos","responseMode":"responseNode"}},
+    {"id":"2","name":"Ask","type":"n8n-nodes-base.httpRequest","typeVersion":4.2,"position":[220,0],"parameters":{"method":"POST","url":"http://localhost:8000/ask","sendBody":true,"specifyBody":"json","jsonBody":"={{ JSON.stringify({ question: $json.body.question }) }}"}},
+    {"id":"3","name":"Grounded?","type":"n8n-nodes-base.if","typeVersion":2,"position":[440,0],"parameters":{"conditions":{"options":{"caseSensitive":true,"leftValue":"","typeValidation":"strict"},"conditions":[{"id":"grounded","leftValue":"={{ $json.grounded }}","rightValue":"","operator":{"type":"boolean","operation":"true","singleValue":true}}],"combinator":"and"}}},
+    {"id":"4","name":"Respond answer","type":"n8n-nodes-base.respondToWebhook","typeVersion":1.1,"position":[660,-80],"parameters":{"respondWith":"json","responseBody":"={{ JSON.stringify({ status: 'answered', answer: $json.answer, citations: $json.citations }) }}"}},
+    {"id":"5","name":"Respond forwarded","type":"n8n-nodes-base.respondToWebhook","typeVersion":1.1,"position":[660,80],"parameters":{"respondWith":"json","responseBody":"={{ JSON.stringify({ status: 'forwarded', answer: 'Sua pergunta foi encaminhada para a área responsável.' }) }}"}}
+  ],
+  "connections":{"Webhook":{"main":[[{"node":"Ask","type":"main","index":0}]]},"Ask":{"main":[[{"node":"Grounded?","type":"main","index":0}]]},"Grounded?":{"main":[[{"node":"Respond answer","type":"main","index":0}],[{"node":"Respond forwarded","type":"main","index":0}]]}},
+  "settings":{},"active":false
+}

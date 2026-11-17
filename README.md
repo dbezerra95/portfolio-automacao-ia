@@ -23,6 +23,7 @@ Projetos práticos de automação, integração de sistemas e IA com supervisão
 | Roteador de LLM | Tenta outro provedor quando uma resposta falha temporariamente. | [llm-router](llm-router/) |
 | Coletores RPA | Coleta dados públicos e identifica alterações sem duplicar registros. | [rpa-collectors](rpa-collectors/) |
 | Radar de IA | Reúne e resume notícias inéditas de fontes públicas. | [ai-radar](ai-radar/) |
+| RAG de normativos | Responde perguntas sobre a LC 108/2001 e a LC 109/2001 citando o artigo e recusando quando não encontra. | [rag-normativos](rag-normativos/) |
 | Zonas de manejo | Identifica diferenças de vegetação e sugere pontos para amostragem de solo. | [soil-management-zones](soil-management-zones/) |
 
 
@@ -54,6 +55,7 @@ Todas as integrações usam rotas públicas, sem login de advogado nem certifica
 | [llm-router](llm-router/) | Médio | Uso da resposta e configuração de provedores | Prompt informado pelo usuário | Provedor e latência na resposta; sem auditoria persistente |
 | [rpa-collectors](rpa-collectors/) | Baixo | Uso dos dados coletados | Nenhum LLM | Registros e hashes em SQLite; contagens por execução |
 | [ai-radar](ai-radar/) | Baixo | Leitura e uso do digest | Título e descrição de notícia pública | Digest, estado de links e alerta de falha |
+| [rag-normativos](rag-normativos/) | Baixo | Interpretação e resposta oficial ficam com a área responsável | Nenhum por padrão (LLM local); trechos de lei pública se configurado | Pergunta, artigos recuperados e flag grounded em JSONL |
 | [soil-management-zones](soil-management-zones/) | Médio | Escolha e análise das amostras de solo | Nenhum LLM | Mapas, pontos e resumo das cenas utilizadas |
 
 Classificação inspirada em políticas públicas de uso de IA (risco, supervisão humana, inventário); é uma autoavaliação, não uma certificação.
