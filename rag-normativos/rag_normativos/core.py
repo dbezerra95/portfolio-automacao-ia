@@ -12,7 +12,7 @@ from pydantic import BaseModel
 
 NOT_FOUND = "Não encontrei isso nos normativos indexados."
 LLM_DOWN = "Não consegui gerar a resposta agora (modelo indisponível). A pergunta deve seguir para a área responsável."
-DEFAULT_MIN_SCORE = {"bm25": 0.18, "embeddings": 0.55}
+DEFAULT_MIN_SCORE = {"bm25": 0.18, "embeddings": 0.5}
 STOPWORDS = set(
     "a o as os um uma uns umas de do da dos das em no na nos nas por para com sem sob sobre e ou que se "
     "ao aos como qual quais quem quando onde ser sao foi sera esta esse essa isso este isto ha mais "
@@ -81,7 +81,7 @@ def embed_texts(texts: list[str]) -> list[list[float]]:
         response = httpx.post(
             base + "/embeddings",
             headers={"Authorization": f"Bearer {key}"} if key else {},
-            json={"model": os.environ.get("EMBED_MODEL", "nomic-embed-text"), "input": texts[start:start + 32]},
+            json={"model": os.environ.get("EMBED_MODEL", "bge-m3"), "input": texts[start:start + 32]},
             timeout=120,
         )
         response.raise_for_status()
